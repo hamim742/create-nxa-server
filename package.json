@@ -1,0 +1,25 @@
+{
+  "name": "create-nxa-server",
+  "version": "1.0.0",
+  "description": "A CLI tool to bootstrap a new Express + Prisma + MongoDB backend server.",
+  "main": "bin/cli.js",
+  "bin": {
+    "create-nxa-server": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "template",
+    "README.md"
+  ],
+  "keywords": [
+    "express",
+    "prisma",
+    "mongodb",
+    "boilerplate",
+    "server",
+    "cli",
+    "bootstrap"
+  ],
+  "author": "Hamim",
+  "license": "MIT"
+}

@@ -18,7 +18,16 @@
     "boilerplate",
     "server",
     "cli",
-    "bootstrap"
+    "bootstrap",
+    "typescript",
+    "backend",
+    "starter",
+    "template",
+    "rest-api",
+    "expressjs",
+    "zod",
+    "error-handling",
+    "project-generator"
   ],
   "author": "Hamim",
   "license": "MIT",

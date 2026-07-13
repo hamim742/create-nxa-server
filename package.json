@@ -21,5 +21,13 @@
     "bootstrap"
   ],
   "author": "Hamim",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HamimBhai742/create-nxa-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HamimBhai742/create-nxa-server/issues"
+  },
+  "homepage": "https://github.com/HamimBhai742/create-nxa-server#readme"
 }

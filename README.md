@@ -1,6 +1,6 @@
 # create-nxa-server 🚀
 
-A modern CLI tool to bootstrap a new **Express + Prisma + MongoDB** backend server with TypeScript. Out-of-the-box support for database connections, robust global error handling, environment configs, and routing.
+A modern CLI tool to bootstrap a new **Express + Prisma + MongoDB** backend server with TypeScript. Comes out-of-the-box with **JWT Authentication**, **User Management**, database connections, robust error handling, Zod validation, environment configs, and clean modular routing.
 
 [![npm version](https://img.shields.io/npm/v/create-nxa-server.svg?style=flat-square)](https://www.npmjs.com/package/create-nxa-server)
 [![npm downloads](https://img.shields.io/npm/dm/create-nxa-server.svg?style=flat-square)](https://www.npmjs.com/package/create-nxa-server)
@@ -27,12 +27,12 @@ create-nxa-server my-new-server
 
 ## 📂 Generated Project Structure
 
-The generated backend project is structured as follows:
+The generated backend project follows a clean modular architecture:
 
 ```text
 my-server/
 ├── prisma/
-│   └── schema.prisma      # Prisma schema (configured with MongoDB)
+│   └── schema.prisma      # Prisma schema (MongoDB configured with User model & Enums)
 ├── src/
 │   ├── app/
 │   │   ├── db/
@@ -42,8 +42,23 @@ my-server/
 │   │   ├── lib/
 │   │   │   └── prisma.ts        # Prisma client instantiation
 │   │   ├── middleware/
+│   │   │   ├── auth.ts          # JWT Authentication & Role-Based Access Control (RBAC)
+│   │   │   ├── validateRequest.ts # Zod Schema validation middleware
 │   │   │   ├── globalErrorHandler.ts # Formatted Zod & Prisma error responses
 │   │   │   └── notFound.ts      # 404 Route handler
+│   │   ├── modules/
+│   │   │   ├── auth/            # Authentication module (Register, Login, Password, Token)
+│   │   │   │   ├── auth.controller.ts
+│   │   │   │   ├── auth.interface.ts
+│   │   │   │   ├── auth.routes.ts
+│   │   │   │   ├── auth.service.ts
+│   │   │   │   └── auth.validation.ts
+│   │   │   └── user/            # User Profile & User Management module
+│   │   │       ├── user.controller.ts
+│   │   │       ├── user.interface.ts
+│   │   │       ├── user.routes.ts
+│   │   │       ├── user.service.ts
+│   │   │       └── user.validation.ts
 │   │   ├── routes/
 │   │   │   └── index.ts         # Main router registry
 │   │   └── utils/
@@ -51,6 +66,8 @@ my-server/
 │   │       └── sendResponse.ts  # Standardized API response format
 │   ├── config/
 │   │   └── index.ts       # Typed configurations using dotenv
+│   ├── types/
+│   │   └── index.d.ts     # Express Request type extensions
 │   ├── app.ts             # Express App setup & middleware configuration
 │   └── server.ts          # Server entry point (Exception handling & port listener)
 ├── .env.example           # Environment variables template
@@ -60,16 +77,24 @@ my-server/
 
 ---
 
-## ✨ Features
+## ✨ Pre-Built Features & Endpoints
 
-- **Express & TypeScript**: Strongly typed requests, responses, and middlewares.
-- **Prisma & MongoDB**: Pre-configured MongoDB client connection.
-- **Auto-Configured Middlewares**: Includes `cors`, `cookie-parser`, `helmet`, and JSON request body parser.
-- **Standardized Error Handling**:
-  - Automatically catches unhandled exceptions & promise rejections.
-  - Formats Zod validation errors to display which fields failed validation.
-  - Automatically extracts and formats Prisma unique constraint conflicts (e.g. duplicate email).
-- **Graceful Shutdown**: Shuts down the HTTP listener and disconnects database connections on `SIGTERM` / `SIGINT` signals.
+### 🔐 Authentication Module (`/api/v1/auth`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/register` | Public | Register a new user with hashed password (bcrypt) |
+| `POST` | `/login` | Public | Authenticate user & return JWT token |
+| `POST` | `/change-password` | Authenticated | Change logged-in user password |
+| `POST` | `/refresh-token` | Public | Generate a new access token |
+
+### 👤 User Module (`/api/v1/user`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/me` | Authenticated | Get logged-in user profile |
+| `PATCH` | `/me` | Authenticated | Update logged-in user profile |
+| `GET` | `/` | Admin | Get list of all users |
+| `GET` | `/:id` | Admin | Get user details by ID |
+| `PATCH` | `/:id/status` | Admin | Update user status (`active`/`inactive`/`blocked`) or role |
 
 ---
 

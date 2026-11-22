@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 export default {
+  project_name: process.env.PROJECT_NAME || "My Server",
   NODE_ENV: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT) || 5000,
   database_url: process.env.DATABASE_URL as string,

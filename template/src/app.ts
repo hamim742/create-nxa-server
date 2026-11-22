@@ -5,6 +5,8 @@ import { notFound } from "./app/middleware/notFound";
 import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
+import config from "./config";
+import { renderHomePage } from "./app/views/home";
 
 const app: Application = express();
 
@@ -43,7 +45,17 @@ app.use(
 app.use("/api/v1", router);
 
 app.get("/", (req, res) => {
-  res.send("my-server is running............");
+  res.type("html").send(renderHomePage());
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    name: config.project_name,
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use(globalErrorHandler);

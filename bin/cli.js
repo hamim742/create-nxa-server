@@ -107,7 +107,10 @@ async function main() {
     const targetEnvPath = path.join(targetDirPath, '.env');
     const templateEnvExamplePath = path.join(templateDirPath, '.env.example');
     if (fs.existsSync(templateEnvExamplePath)) {
-      fs.copyFileSync(templateEnvExamplePath, targetEnvPath);
+      const envContent = fs
+        .readFileSync(templateEnvExamplePath, 'utf8')
+        .replace(/^PROJECT_NAME=.*$/m, `PROJECT_NAME="${path.basename(targetDirName).replace(/"/g, '')}"`);
+      fs.writeFileSync(targetEnvPath, envContent, 'utf8');
       console.log(`✅  ${green('Created .env config file.')}`);
     }
   } catch (err) {

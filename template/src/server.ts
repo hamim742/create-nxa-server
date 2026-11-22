@@ -8,7 +8,7 @@ const port = config.port;
 
 const main = () => {
   server = app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`🚀 ${config.project_name} is running on http://localhost:${port}`);
   });
 
   connectedDB();

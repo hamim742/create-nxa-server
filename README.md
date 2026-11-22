@@ -79,6 +79,16 @@ my-server/
 
 ## ✨ Pre-Built Features & Endpoints
 
+### 🖥️ Server Status Page
+
+Open `http://localhost:5000/` to see an animated status page with your project name, live uptime, environment, and API endpoints. `GET /health` returns a JSON health check.
+
+The project name comes from `PROJECT_NAME` in `.env` (the CLI sets it to your project directory name):
+
+```env
+PROJECT_NAME="my-server-app"
+```
+
 ### 🔐 Authentication Module (`/api/v1/auth`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |

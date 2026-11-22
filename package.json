@@ -1,6 +1,6 @@
 {
   "name": "create-nxa-server",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A CLI tool to bootstrap a new Express + Prisma + MongoDB backend server.",
   "main": "bin/cli.js",
   "bin": {
@@ -38,9 +38,5 @@
   "bugs": {
     "url": "https://github.com/HamimBhai742/create-nxa-server/issues"
   },
-  "homepage": "https://github.com/HamimBhai742/create-nxa-server#readme",
-  "dependencies": {
-    "dotenv": "^8.2.0",
-    "node-fetch": "^3.3.2"
-  }
+  "homepage": "https://github.com/HamimBhai742/create-nxa-server#readme"
 }

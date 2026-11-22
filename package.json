@@ -38,5 +38,9 @@
   "bugs": {
     "url": "https://github.com/HamimBhai742/create-nxa-server/issues"
   },
-  "homepage": "https://github.com/HamimBhai742/create-nxa-server#readme"
+  "homepage": "https://github.com/HamimBhai742/create-nxa-server#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "node-fetch": "^3.3.2"
+  }
 }

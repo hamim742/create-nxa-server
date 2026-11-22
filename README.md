@@ -1,6 +1,6 @@
-# create-nxa-server 🚀
+# create-nxa-server
 
-A modern CLI tool to bootstrap a new **Express + Prisma + MongoDB** backend server with TypeScript. Comes out-of-the-box with **JWT Authentication**, **User Management**, database connections, robust error handling, Zod validation, environment configs, and clean modular routing.
+A CLI tool that bootstraps a production-ready **Express + Prisma + MongoDB** backend in TypeScript. Generated projects include JWT authentication, user management, Zod request validation, centralized error handling, typed configuration, and a modular folder structure.
 
 [![npm version](https://img.shields.io/npm/v/create-nxa-server.svg?style=flat-square)](https://www.npmjs.com/package/create-nxa-server)
 [![npm downloads](https://img.shields.io/npm/dm/create-nxa-server.svg?style=flat-square)](https://www.npmjs.com/package/create-nxa-server)
@@ -8,121 +8,192 @@ A modern CLI tool to bootstrap a new **Express + Prisma + MongoDB** backend serv
 
 ---
 
-## ⚡ Quick Start
+## Requirements
 
-Create a new server project instantly by running:
+- Node.js 18.18 or later
+- npm
+- A MongoDB database (local or hosted, e.g. MongoDB Atlas)
+
+---
+
+## Quick Start
+
+Create a new project:
 
 ```bash
 npx create-nxa-server my-new-server
 ```
 
-Or install it globally and run it:
+Or install the CLI globally:
 
 ```bash
 npm install -g create-nxa-server
 create-nxa-server my-new-server
 ```
 
+The CLI will:
+
+1. Copy the server template into a new directory
+2. Create a `.env` file with `PROJECT_NAME` set to your project name
+3. Initialize a Git repository with an initial commit
+4. Install dependencies and generate the Prisma Client
+
+Then start the server:
+
+```bash
+cd my-new-server
+npm run dev
+```
+
+Open `http://localhost:5000` to view the server status page.
+
 ---
 
-## 📂 Generated Project Structure
+## Configuration
 
-The generated backend project follows a clean modular architecture:
+All settings are read from `.env` in the project root.
+
+| Variable         | Default                   | Description                                         |
+| :--------------- | :------------------------ | :-------------------------------------------------- |
+| `PROJECT_NAME`   | Your project name         | Name shown on the status page and in server logs    |
+| `PORT`           | `5000`                    | Port the HTTP server listens on                     |
+| `DATABASE_URL`   | -                         | MongoDB connection string                           |
+| `PASSWORD_SALT`  | `10`                      | bcrypt salt rounds for password hashing             |
+| `JWT_SECRET`     | -                         | Secret used to sign JWT tokens (change this)        |
+| `JWT_EXPIRES_IN` | `1d`                      | Access token lifetime                               |
+| `NODE_ENV`       | `development`             | Runtime environment                                 |
+
+---
+
+## Features
+
+### Server Status Page
+
+`GET /` serves an animated status page that displays the project name, live server status and response time, uptime, environment, Node.js version, and the main API endpoints.
+
+`GET /health` returns a JSON health check, suitable for uptime monitors and load balancers:
+
+```json
+{
+  "success": true,
+  "name": "my-new-server",
+  "status": "ok",
+  "uptime": 42.18,
+  "timestamp": "2026-01-01T00:00:00.000Z"
+}
+```
+
+### Authentication Module (`/api/v1/auth`)
+
+| Method | Endpoint           | Access        | Description                                   |
+| :----- | :----------------- | :------------ | :-------------------------------------------- |
+| `POST` | `/register`        | Public        | Register a new user (password hashed with bcrypt) |
+| `POST` | `/login`           | Public        | Authenticate and return a JWT                 |
+| `POST` | `/change-password` | Authenticated | Change the current user's password            |
+| `POST` | `/refresh-token`   | Public        | Issue a new access token                      |
+
+### User Module (`/api/v1/user`)
+
+| Method  | Endpoint      | Access        | Description                                            |
+| :------ | :------------ | :------------ | :----------------------------------------------------- |
+| `GET`   | `/me`         | Authenticated | Get the current user's profile                         |
+| `PATCH` | `/me`         | Authenticated | Update the current user's profile                      |
+| `GET`   | `/`           | Admin         | List all users                                         |
+| `GET`   | `/:id`        | Admin         | Get a user by ID                                       |
+| `PATCH` | `/:id/status` | Admin         | Update a user's status (`active` / `inactive` / `blocked`) or role |
+
+### Built-in Infrastructure
+
+- **Validation:** Zod schemas applied through a reusable `validateRequest` middleware
+- **Error handling:** a global handler that formats Zod validation errors and Prisma errors (such as duplicate keys) into consistent JSON responses
+- **Authorization:** JWT middleware with role-based access control (`user`, `admin`)
+- **Responses:** a shared `sendResponse` helper for a uniform response shape
+- **Stability:** handlers for uncaught exceptions and unhandled promise rejections
+
+---
+
+## Project Structure
 
 ```text
 my-server/
 ├── prisma/
-│   └── schema.prisma      # Prisma schema (MongoDB configured with User model & Enums)
+│   └── schema.prisma             # MongoDB schema with User model and enums
 ├── src/
 │   ├── app/
 │   │   ├── db/
-│   │   │   └── connected.db.ts  # Database connection module
+│   │   │   └── connected.db.ts   # Database connection
 │   │   ├── error/
-│   │   │   └── AppError.ts      # Custom error class
+│   │   │   └── AppError.ts       # Custom error class
 │   │   ├── lib/
-│   │   │   └── prisma.ts        # Prisma client instantiation
+│   │   │   └── prisma.ts         # Prisma client instance
 │   │   ├── middleware/
-│   │   │   ├── auth.ts          # JWT Authentication & Role-Based Access Control (RBAC)
-│   │   │   ├── validateRequest.ts # Zod Schema validation middleware
-│   │   │   ├── globalErrorHandler.ts # Formatted Zod & Prisma error responses
-│   │   │   └── notFound.ts      # 404 Route handler
+│   │   │   ├── auth.ts           # JWT authentication and role-based access
+│   │   │   ├── validateRequest.ts# Zod request validation
+│   │   │   ├── globalErrorHandler.ts
+│   │   │   └── notFound.ts       # 404 handler
 │   │   ├── modules/
-│   │   │   ├── auth/            # Authentication module (Register, Login, Password, Token)
-│   │   │   │   ├── auth.controller.ts
-│   │   │   │   ├── auth.interface.ts
-│   │   │   │   ├── auth.routes.ts
-│   │   │   │   ├── auth.service.ts
-│   │   │   │   └── auth.validation.ts
-│   │   │   └── user/            # User Profile & User Management module
-│   │   │       ├── user.controller.ts
-│   │   │       ├── user.interface.ts
-│   │   │       ├── user.routes.ts
-│   │   │       ├── user.service.ts
-│   │   │       └── user.validation.ts
+│   │   │   ├── auth/             # Register, login, password, token
+│   │   │   └── user/             # Profile and user management
 │   │   ├── routes/
-│   │   │   └── index.ts         # Main router registry
-│   │   └── utils/
-│   │       ├── catchAsync.ts    # Async wrapper to eliminate try-catch boilerplate
-│   │       └── sendResponse.ts  # Standardized API response format
+│   │   │   └── index.ts          # Route registry
+│   │   ├── utils/
+│   │   │   ├── catchAsync.ts     # Async error wrapper
+│   │   │   └── sendResponse.ts   # Standard response format
+│   │   └── views/
+│   │       └── home.ts           # Server status page
 │   ├── config/
-│   │   └── index.ts       # Typed configurations using dotenv
+│   │   └── index.ts              # Typed environment configuration
 │   ├── types/
-│   │   └── index.d.ts     # Express Request type extensions
-│   ├── app.ts             # Express App setup & middleware configuration
-│   └── server.ts          # Server entry point (Exception handling & port listener)
-├── .env.example           # Environment variables template
-├── tsconfig.json          # TypeScript configurations
-└── package.json           # Scripts and dependencies
+│   │   └── index.d.ts            # Express Request type extensions
+│   ├── app.ts                    # Express app and middleware setup
+│   └── server.ts                 # Entry point and process handlers
+├── .env.example                  # Environment variable template
+├── tsconfig.json
+└── package.json
 ```
 
----
-
-## ✨ Pre-Built Features & Endpoints
-
-### 🖥️ Server Status Page
-
-Open `http://localhost:5000/` to see an animated status page with your project name, live uptime, environment, and API endpoints. `GET /health` returns a JSON health check.
-
-The project name comes from `PROJECT_NAME` in `.env` (the CLI sets it to your project directory name):
-
-```env
-PROJECT_NAME="my-server-app"
-```
-
-### 🔐 Authentication Module (`/api/v1/auth`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/register` | Public | Register a new user with hashed password (bcrypt) |
-| `POST` | `/login` | Public | Authenticate user & return JWT token |
-| `POST` | `/change-password` | Authenticated | Change logged-in user password |
-| `POST` | `/refresh-token` | Public | Generate a new access token |
-
-### 👤 User Module (`/api/v1/user`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/me` | Authenticated | Get logged-in user profile |
-| `PATCH` | `/me` | Authenticated | Update logged-in user profile |
-| `GET` | `/` | Admin | Get list of all users |
-| `GET` | `/:id` | Admin | Get user details by ID |
-| `PATCH` | `/:id/status` | Admin | Update user status (`active`/`inactive`/`blocked`) or role |
+Each module follows the same layout: `*.routes.ts`, `*.controller.ts`, `*.service.ts`, `*.validation.ts`, and `*.interface.ts`. To add a module, create a folder under `src/app/modules/` and register its router in `src/app/routes/index.ts`.
 
 ---
 
-## 🛠️ Generated Scripts
+## Scripts
 
-Inside the generated project directory, you can run:
+| Command         | Description                                                  |
+| :-------------- | :----------------------------------------------------------- |
+| `npm run dev`   | Start the development server with live reload (`ts-node-dev`) |
+| `npm run build` | Generate the Prisma Client and compile TypeScript to `dist/`  |
+| `npm run start` | Run the compiled production server from `dist/server.js`      |
 
-#### `npm run dev`
-Starts the development server with live reload (`ts-node-dev`) and automatically generates the Prisma Client if any schema changes occur.
-
-#### `npm run build`
-Compiles TypeScript into production-ready JavaScript inside the `dist/` directory.
-
-#### `npm run start`
-Starts the production server by executing `node dist/server.js`.
+The Prisma Client is also generated automatically after `npm install`. After changing `prisma/schema.prisma`, run `npx prisma generate` (or `npm run build`) to regenerate it.
 
 ---
 
-## 📄 License
+## Changelog
 
-This project is licensed under the [MIT License](LICENSE).
+### 1.0.6
+
+- Added an animated server status page at `/` that shows the project name
+- Added the `GET /health` endpoint
+- Added the `PROJECT_NAME` environment variable, set automatically by the CLI
+- Removed malicious code introduced in 1.0.5. **Do not use 1.0.5.** If you generated a project with it, see the security note below.
+
+### 1.0.4
+
+- Added authentication and user modules
+
+---
+
+## Security Note for 1.0.5
+
+Version 1.0.5 contained malicious code. Projects generated with it run remote code whenever `npm run dev`, `npm run build`, or `npm run start` is executed. If you used that version:
+
+1. Delete the `init` file from the project root.
+2. Remove `node init &&` from the `dev`, `build`, and `start` scripts in `package.json`.
+3. Remove the `AUTH_API_KEY` block at the end of `src/app.ts` and the `AUTH_API_KEY` line from `.env`.
+4. If any of those scripts were run, treat the machine as compromised and rotate passwords, API keys, and other credentials stored on it.
+
+---
+
+## License
+
+Released under the [MIT License](https://opensource.org/licenses/MIT).
